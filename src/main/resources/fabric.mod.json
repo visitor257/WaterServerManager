@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "waterservermanager",
+  "version": "${version}",
+  "name": "WaterServerManager",
+  "description": "离线服管理：内部账号、正版信息还原、居民系统。",
+  "authors": [
+    "Ponko"
+  ],
+  "license": "MIT",
+  "environment": "server",
+  "mixins": [
+    "waterservermanager.mixins.json"
+  ],
+  "entrypoints": {
+    "main": [
+      "com.ponko.craftfriend.CraftFriend"
+    ],
+    "server": [
+      "com.ponko.craftfriend.CraftFriendServer"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  },
+  "suggests": {
+    "yes_steve_model": "*"
+  }
+}

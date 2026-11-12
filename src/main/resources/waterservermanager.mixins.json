@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.ponko.craftfriend.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "LoginHandlerMixin",
+    "PlayerListNameMixin",
+    "PlayerDisplayNameMixin",
+    "JoinLeaveMessageMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

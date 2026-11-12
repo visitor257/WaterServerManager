@@ -1,0 +1,39 @@
+# ---- Gradle / Java ----
+.gradle/
+.gradle-home/
+.tools/
+.test-server/
+.test-server-new/
+.test-server-old-*/
+legacy/
+build/
+out/
+run/
+!gradle-wrapper.jar
+*.class
+
+# ---- IDE ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# ---- 运行时数据（居民的记忆、密钥、皮肤，绝不入库）----
+config/
+world/
+logs/
+auth/
+*.log
+
+# ---- 旧方案遗留 ----
+node_modules/
+.env
+config.json
+
+# ---- 模型/大资源 ----
+*.ysm
+
+# ---- 系统 ----
+.DS_Store
+Thumbs.db

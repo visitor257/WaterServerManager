@@ -31,6 +31,10 @@ node_modules/
 .env
 config.json
 
+# ---- 客户端本地配置/记忆 ----
+client/config.json
+client/data/
+
 # ---- 模型/大资源 ----
 *.ysm
 

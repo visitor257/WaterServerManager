@@ -3,6 +3,7 @@ package com.ponko.craftfriend.mixin;
 import com.mojang.authlib.GameProfile;
 import com.ponko.craftfriend.CraftFriend;
 import com.ponko.craftfriend.account.PremiumVerifier;
+import com.ponko.craftfriend.account.ProtectedList;
 import com.ponko.craftfriend.account.UuidMode;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.c2s.login.LoginHelloC2SPacket;
@@ -55,20 +56,44 @@ public abstract class LoginHandlerMixin {
 
     @Inject(method = "tickVerify", at = @At("HEAD"), cancellable = true)
     private void waterservermanager$priority(GameProfile profile, CallbackInfo ci) {
-        if (!UuidMode.stable || !UuidMode.priority || profile == null) {
+        if (!UuidMode.stable || profile == null) {
             return;
         }
         String name = profile.getName();
         ServerPlayerEntity existing = server.getPlayerManager().getPlayer(name);
-        boolean newPremium = PremiumVerifier.isPremium(name, waterservermanager$clientUuid);
+        boolean newProtected = ProtectedList.isProtected(name);
 
-        if (existing != null && PremiumVerifier.isOnlinePremium(name) && !newPremium) {
-            connection.disconnect(Text.literal("正版账号在线，离线客户端不能顶号"));
-            CraftFriend.LOGGER.info("[Auth] 拒绝离线顶号：{}（正版在线）", name);
-            ci.cancel();
+        if (existing != null) {
+            if (ProtectedList.isOnlineProtected(name)) {
+                connection.disconnect(Text.literal("该玩家受保护，无法顶号"));
+                CraftFriend.LOGGER.info("[Auth] 拒绝顶号：{}（受保护）", name);
+                ci.cancel();
+                return;
+            }
+            if (newProtected) {
+                // 保护名单成员后到：允许他接管，原版会踢掉旧会话。
+                ProtectedList.markOnline(name, true);
+                CraftFriend.LOGGER.info("[Auth] 受保护玩家 {} 接管在线会话", name);
+                return;
+            }
+            if (UuidMode.priority) {
+                boolean newPremium = PremiumVerifier.isPremium(name, waterservermanager$clientUuid);
+                if (PremiumVerifier.isOnlinePremium(name) && !newPremium) {
+                    connection.disconnect(Text.literal("正版账号在线，离线客户端不能顶号"));
+                    CraftFriend.LOGGER.info("[Auth] 拒绝离线顶号：{}（正版在线）", name);
+                    ci.cancel();
+                    return;
+                }
+                PremiumVerifier.markOnline(name, newPremium);
+            }
             return;
         }
-        PremiumVerifier.markOnline(name, newPremium);
+
+        ProtectedList.markOnline(name, newProtected);
+        if (UuidMode.priority) {
+            PremiumVerifier.markOnline(name,
+                    PremiumVerifier.isPremium(name, waterservermanager$clientUuid));
+        }
     }
 
     @ModifyVariable(method = "tickVerify", at = @At("HEAD"), argsOnly = true)

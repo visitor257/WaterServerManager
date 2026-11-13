@@ -83,6 +83,13 @@ public final class AccountCommand {
                         .then(CommandManager.argument("name", StringArgumentType.word())
                                 .executes(context -> delete(context,
                                         StringArgumentType.getString(context, "name")))))
+                .then(CommandManager.literal("protect")
+                        .then(CommandManager.argument("name", StringArgumentType.word())
+                                .then(CommandManager.argument("enabled", BoolArgumentType.bool())
+                                        .executes(context -> protect(context,
+                                                StringArgumentType.getString(context, "name"),
+                                                BoolArgumentType.getBool(context, "enabled"))))))
+                .then(CommandManager.literal("protectlist").executes(AccountCommand::protectList))
                 .then(CommandManager.literal("list").executes(AccountCommand::list))
                 .then(CommandManager.literal("enable")
                         .then(CommandManager.argument("enabled", BoolArgumentType.bool())
@@ -253,6 +260,27 @@ public final class AccountCommand {
             return 0;
         }
         context.getSource().sendFeedback(() -> Text.literal("已删除账号 " + name), false);
+        return 1;
+    }
+
+    private static int protect(CommandContext<ServerCommandSource> context,
+                               String name, boolean enabled) {
+        CraftFriendConfig config = CraftFriendConfig.get();
+        config.auth.protectedNames.removeIf(existing -> existing.equalsIgnoreCase(name));
+        if (enabled) {
+            config.auth.protectedNames.add(name);
+        }
+        CraftFriendConfig.save();
+        ProtectedList.load(config.auth.protectedNames);
+        context.getSource().sendFeedback(() -> Text.literal(
+                (enabled ? "已保护 " : "已取消保护 ") + name), false);
+        return 1;
+    }
+
+    private static int protectList(CommandContext<ServerCommandSource> context) {
+        var names = CraftFriendConfig.get().auth.protectedNames;
+        context.getSource().sendFeedback(() -> Text.literal(
+                names.isEmpty() ? "保护名单为空" : "保护名单：" + String.join("、", names)), false);
         return 1;
     }
 

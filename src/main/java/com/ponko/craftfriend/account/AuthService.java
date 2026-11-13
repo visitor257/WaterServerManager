@@ -57,6 +57,7 @@ public final class AuthService {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             server.getPlayerManager().removeFromOperators(handler.player.getGameProfile());
             PremiumVerifier.removeOnline(handler.player.getGameProfile().getName());
+            ProtectedList.removeOnline(handler.player.getGameProfile().getName());
             AUTHENTICATED.remove(handler.player.getUuid());
             PREVIOUS_MODE.remove(handler.player.getUuid());
             ANCHORS.remove(handler.player.getUuid());

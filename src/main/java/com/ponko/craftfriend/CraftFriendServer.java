@@ -30,6 +30,8 @@ public final class CraftFriendServer implements DedicatedServerModInitializer {
                 com.ponko.craftfriend.config.CraftFriendConfig.get().auth.stableUuid;
         com.ponko.craftfriend.account.UuidMode.priority =
                 com.ponko.craftfriend.config.CraftFriendConfig.get().auth.priority;
+        com.ponko.craftfriend.account.ProtectedList.load(
+                com.ponko.craftfriend.config.CraftFriendConfig.get().auth.protectedNames);
         AuthService.register();
         PlayerDataService.register();
         SkinService.register();
